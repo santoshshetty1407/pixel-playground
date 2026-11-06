@@ -1,31 +1,27 @@
-# Pixel Playground
+# The Little Lock Room
 
-**CTRL + PLAY · AI Game Development Workshop · NIT Calicut**
-
-Eat sharks, dodge moving drones, and beat your best score. Aim the revolver with the mouse and hold the left button to fire. Eating a shark locks the gun for five seconds; the countdown appears in the HUD. Every five sharks adds a level. Drone speed and count rise up to the limits in `RULES`.
+A friendly, self-contained escape-room game made with HTML, CSS, Canvas, and plain JavaScript. Find three simple visual clues, enter their numbers in order, and open the door. It runs offline and has no external dependencies.
 
 ## Play locally
 
-1. Extract the ZIP. Keep its folders together.
-2. Double-click `index.html` to open it in a browser.
-3. Select **Start game**. Move with **WASD** or the **arrow keys**, aim with the mouse, and hold the left mouse button to fire. On a touch screen, hold the direction buttons under the arena.
-4. If you hit a drone, choose **Play again**. Each new round resets the score and level. The best score is saved where the browser permits local storage.
+1. Open `index.html` in a modern browser.
+2. Click the three glowing objects: the picture, bookshelf, and window.
+3. Read the clues and count the matching objects in the room.
+4. Enter the three numbers in clue order, then choose **Open**. Use the number keys and Enter if you prefer.
+5. Choose **Restart** to try again.
 
-The game runs offline. You only need a browser and a text editor. After editing a file, save it and refresh the browser.
+Your clue progress, timer, and score are shown above the room. The score starts at 1000 and gently decreases over time; there is no time limit.
 
-## Find your way around
+## Files
 
-| File | What to edit |
+| File | Purpose |
 | --- | --- |
-| `index.html` | Title, mission, controls, legend and HUD |
-| `style.css` | Page palette and layout, with colors grouped at the top |
-| `game.js` | Arena colors in `THEME`, movement and difficulty in `RULES`, art in `draw()` |
-| `starter/index.html` | Movement-only demo for the instructor or participants |
-| `starter/starter.js` | Short game loop and two marked pickup exercise hooks |
-| `EXERCISES.md` | Live demo sequence, Codex prompt and test checkpoints |
+| `index.html` | Game layout, clue list, keypad, instructions, and HUD |
+| `style.css` | Cozy colors, responsive layout, and accessible focus styles |
+| `game.js` | Room art, clickable clue objects, code entry, scoring, and restart |
+| `starter/` | The original small Canvas movement demo for workshop practice |
+| `EXERCISES.md` | Optional ideas for extending the room game |
 
-In the full game, `frame()` repeatedly calls `update()` and `draw()`. The update moves the objects, checks for collisions and changes the score or game state. The draw function paints the current state. `dt` is elapsed time in seconds, so speeds are expressed in pixels per second. Full-game positions are object centers. The starter uses top-left positions to match Canvas's `fillRect()`.
+## Make it your own
 
-## Remix after the roulette
-
-For another underwater theme, make the player a diver, sharks into pearls, and drones into jellyfish. Change the palette in `THEME` and `style.css`, set `collectiblePlural` to `"pearls"`, and update the mission and legend in `index.html`. Edit the collision headline in `endRound()`. Once the theme reads consistently, change one rule and play a round to see its effect.
+Change the clue text and code near the top of `game.js`, then adjust the objects drawn in `drawPicture()`, `drawShelf()`, and `drawWindow()` to match. Keep each clue’s number in the same position in the code.
