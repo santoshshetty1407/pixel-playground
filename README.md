@@ -2,13 +2,13 @@
 
 **CTRL + PLAY · AI Game Development Workshop · NIT Calicut**
 
-Collect sparks, dodge moving drones, and beat your best score. Every five sparks adds a level. Drone speed and count rise up to the limits in `RULES`.
+Eat sharks, dodge moving drones, and beat your best score. Aim the revolver with the mouse and hold the left button to fire. Eating a shark locks the gun for five seconds; the countdown appears in the HUD. Every five sharks adds a level. Drone speed and count rise up to the limits in `RULES`.
 
 ## Play locally
 
 1. Extract the ZIP. Keep its folders together.
 2. Double-click `index.html` to open it in a browser.
-3. Select **Start game**. Move with **WASD** or the **arrow keys**. On a touch screen, hold the direction buttons under the arena.
+3. Select **Start game**. Move with **WASD** or the **arrow keys**, aim with the mouse, and hold the left mouse button to fire. On a touch screen, hold the direction buttons under the arena.
 4. If you hit a drone, choose **Play again**. Each new round resets the score and level. The best score is saved where the browser permits local storage.
 
 The game runs offline. You only need a browser and a text editor. After editing a file, save it and refresh the browser.
@@ -17,7 +17,7 @@ The game runs offline. You only need a browser and a text editor. After editing 
 
 | File | What to edit |
 | --- | --- |
-| `index.html` | Title, mission, controls and legend |
+| `index.html` | Title, mission, controls, legend and HUD |
 | `style.css` | Page palette and layout, with colors grouped at the top |
 | `game.js` | Arena colors in `THEME`, movement and difficulty in `RULES`, art in `draw()` |
 | `starter/index.html` | Movement-only demo for the instructor or participants |
@@ -28,4 +28,4 @@ In the full game, `frame()` repeatedly calls `update()` and `draw()`. The update
 
 ## Remix after the roulette
 
-For an underwater theme, make the player a diver, sparks into pearls, and drones into jellyfish. Change the palette in `THEME` and `style.css`, set `collectiblePlural` to `"pearls"`, and update the mission and legend in `index.html`. Edit the collision headline in `endRound()`. Once the theme reads consistently, change one rule and play a round to see its effect.
+For another underwater theme, make the player a diver, sharks into pearls, and drones into jellyfish. Change the palette in `THEME` and `style.css`, set `collectiblePlural` to `"pearls"`, and update the mission and legend in `index.html`. Edit the collision headline in `endRound()`. Once the theme reads consistently, change one rule and play a round to see its effect.

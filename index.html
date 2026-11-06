@@ -12,13 +12,14 @@
     <header>
       <p class="eyebrow">CTRL + PLAY <span> / </span> NIT CALICUT</p>
       <h1>Pixel <em>Playground</em></h1>
-      <p id="mission">Collect sparks. Dodge drones. See how long you last.</p>
+      <p id="mission">Eat sharks. Aim with the mouse and shoot drones.</p>
     </header>
     <section class="cabinet" aria-label="Arcade game">
       <div class="hud">
         <div>Score <strong id="score">0</strong></div>
         <div>Level <strong id="level">1</strong></div>
         <div>Best <strong id="best">0</strong></div>
+        <div>Gun <strong id="weapon-status">READY</strong> <span class="lock-countdown" id="lock-countdown" hidden></span></div>
       </div>
       <div class="stage">
         <canvas id="arena" width="720" height="432" tabindex="0" aria-label="Game arena" aria-describedby="mission controls">This game requires Canvas support.</canvas>
@@ -32,8 +33,8 @@
         </div>
       </div>
       <div class="legend" id="controls">
-        <span><kbd>WASD</kbd> or <kbd>↑ ← ↓ →</kbd> to move</span>
-        <span><b class="spark">◆</b> Spark &nbsp; <b class="drone">✕</b> Drone</span>
+        <span><kbd>WASD</kbd> or <kbd>↑ ← ↓ →</kbd> to move · Mouse to aim · Hold click to fire</span>
+        <span><b class="spark">◆</b> Shark &nbsp; <b class="drone">✕</b> Drone</span>
       </div>
     </section>
     <div class="touch" aria-label="Direction controls">

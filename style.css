@@ -23,9 +23,11 @@ header > p:last-child { color: var(--muted); margin-bottom: 0; }
 .cabinet { border: 1px solid var(--line); border-radius: 16px; overflow: hidden; background: var(--panel); box-shadow: 0 16px 48px #0005; }
 .hud, .legend { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px 14px; padding: 10px 14px; color: var(--muted); }
 .hud strong { color: var(--text); font-size: 1.2rem; margin-left: 5px; }
+.lock-countdown { color: var(--spark); font-weight: 800; font-variant-numeric: tabular-nums; }
 .stage { position: relative; }
 canvas { display: block; width: 100%; height: auto; background: var(--page); }
 canvas:focus-visible { outline: 2px solid var(--accent); outline-offset: -3px; }
+canvas { cursor: crosshair; }
 .overlay { position: absolute; inset: 0; display: grid; place-items: center; text-align: center; background: #080f1bd9; padding: 8px; }
 .overlay[hidden] { display: none; }
 .overlay p { margin: 6px 0 12px; }

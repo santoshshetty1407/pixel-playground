@@ -1,7 +1,7 @@
 // THEME: Replace these colors and nouns after the theme roulette.
 const THEME = {
   background: "#0b1426", grid: "#1b2a43", player: "#70edcf",
-  collectible: "#ffdc76", hazard: "#ff778e", collectiblePlural: "sparks"
+  collectible: "#ffdc76", hazard: "#ff778e", collectiblePlural: "sharks"
 };
 
 // RULES: Speeds are in Canvas pixels per second.
@@ -18,6 +18,8 @@ const action = document.querySelector("#action");
 const scoreLabel = document.querySelector("#score");
 const levelLabel = document.querySelector("#level");
 const bestLabel = document.querySelector("#best");
+const weaponLabel = document.querySelector("#weapon-status");
+const lockCountdown = document.querySelector("#lock-countdown");
 const panelDetail = document.querySelector("#panel-detail");
 const panelTitle = document.querySelector("#panel-title");
 const status = document.querySelector("#status");
@@ -27,9 +29,13 @@ const touches = new Map();
 const storageKey = "pixel-playground-best";
 
 let state = "ready";
-let player, collectible, hazards, score, level;
+let player, collectible, hazards, bullets, score, level;
 let best = 0;
 let lastTime;
+let aimAngle = 0;
+let mouseDown = false;
+let fireCooldown = 0;
+let weaponLocked = 0;
 
 try {
   best = Number(localStorage.getItem(storageKey)) || 0;
@@ -40,9 +46,13 @@ try {
 function resetRound() {
   player = { x: width / 2, y: height / 2, size: 26 };
   hazards = [];
+  bullets = [];
   collectible = undefined;
   score = 0;
   level = 1;
+  aimAngle = 0;
+  fireCooldown = 0;
+  weaponLocked = 0;
   addHazard();
   addHazard();
   placeCollectible();
@@ -53,6 +63,10 @@ function updateHud() {
   scoreLabel.textContent = score;
   levelLabel.textContent = level;
   bestLabel.textContent = best;
+  const lockedSeconds = Math.ceil(weaponLocked);
+  weaponLabel.textContent = lockedSeconds > 0 ? "LOCKED" : "READY";
+  lockCountdown.textContent = lockedSeconds > 0 ? `${lockedSeconds}s` : "";
+  lockCountdown.hidden = lockedSeconds <= 0;
 }
 
 function startRound() {
@@ -134,15 +148,57 @@ function moveHazards(dt) {
   }
 }
 
+function pointAim(event) {
+  const rect = canvas.getBoundingClientRect();
+  const x = (event.clientX - rect.left) * width / rect.width;
+  const y = (event.clientY - rect.top) * height / rect.height;
+  aimAngle = Math.atan2(y - player.y, x - player.x);
+}
+
+function fireBullet() {
+  if (state !== "playing" || weaponLocked > 0 || fireCooldown > 0) return;
+  const speed = 520;
+  const muzzle = player.size / 2 + 24;
+  bullets.push({
+    x: player.x + Math.cos(aimAngle) * muzzle,
+    y: player.y + Math.sin(aimAngle) * muzzle,
+    dx: Math.cos(aimAngle), dy: Math.sin(aimAngle), size: 6
+  });
+  fireCooldown = 0.22;
+}
+
+function moveBullets(dt) {
+  for (let i = bullets.length - 1; i >= 0; i -= 1) {
+    const bullet = bullets[i];
+    bullet.x += bullet.dx * 520 * dt;
+    bullet.y += bullet.dy * 520 * dt;
+    if (bullet.x < 0 || bullet.x > width || bullet.y < 0 || bullet.y > height) {
+      bullets.splice(i, 1);
+      continue;
+    }
+    const hit = hazards.findIndex(hazard => overlaps(bullet, hazard));
+    if (hit !== -1) {
+      hazards.splice(hit, 1);
+      bullets.splice(i, 1);
+    }
+  }
+}
+
 function update(dt) {
+  weaponLocked = Math.max(0, weaponLocked - dt);
+  fireCooldown = Math.max(0, fireCooldown - dt);
   movePlayer(dt);
   moveHazards(dt);
+  if (mouseDown && weaponLocked === 0) fireBullet();
+  moveBullets(dt);
+  updateHud();
   if (hazards.some(hazard => overlaps(player, hazard))) {
     endRound();
     return;
   }
   if (collectible && overlaps(player, collectible)) {
     score += 1;
+    weaponLocked = 5;
     if (score > best) {
       best = score;
       try {
@@ -173,13 +229,7 @@ function draw() {
   for (let x = 0; x < width; x += 24) ctx.fillRect(x, 0, 1, height);
   for (let y = 0; y < height; y += 24) ctx.fillRect(0, y, width, 1);
 
-  if (collectible) {
-    ctx.save();
-    ctx.translate(collectible.x, collectible.y);
-    ctx.rotate(Math.PI / 4);
-    drawSquare({ x: 0, y: 0, size: collectible.size / Math.SQRT2 }, THEME.collectible);
-    ctx.restore();
-  }
+  if (collectible) drawShark(collectible);
   for (const hazard of hazards) {
     drawSquare(hazard, THEME.hazard);
     ctx.fillStyle = THEME.background;
@@ -192,6 +242,55 @@ function draw() {
   ctx.fillStyle = THEME.background;
   ctx.fillRect(player.x - 7, player.y - 4, 4, 5);
   ctx.fillRect(player.x + 3, player.y - 4, 4, 5);
+  drawGun();
+  for (const bullet of bullets) {
+    ctx.fillStyle = THEME.collectible;
+    ctx.beginPath();
+    ctx.arc(bullet.x, bullet.y, bullet.size / 2, 0, Math.PI * 2);
+    ctx.fill();
+  }
+}
+
+function drawShark(shark) {
+  ctx.save();
+  ctx.translate(shark.x, shark.y);
+  ctx.fillStyle = THEME.collectible;
+  ctx.beginPath();
+  ctx.ellipse(0, 0, 12, 7, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.beginPath();
+  ctx.moveTo(-10, 0);
+  ctx.lineTo(-17, -6);
+  ctx.lineTo(-16, 0);
+  ctx.lineTo(-17, 6);
+  ctx.closePath();
+  ctx.fill();
+  ctx.beginPath();
+  ctx.moveTo(-2, -5);
+  ctx.lineTo(2, -11);
+  ctx.lineTo(6, -4);
+  ctx.closePath();
+  ctx.fill();
+  ctx.fillStyle = THEME.background;
+  ctx.beginPath();
+  ctx.arc(7, -2, 1.2, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.restore();
+}
+
+function drawGun() {
+  ctx.save();
+  ctx.translate(player.x, player.y);
+  ctx.rotate(aimAngle);
+  ctx.fillStyle = "#d6dfec";
+  ctx.fillRect(3, -4, 27, 8);
+  ctx.fillStyle = "#8998ae";
+  ctx.fillRect(7, -6, 9, 12);
+  ctx.fillStyle = "#ffdc76";
+  ctx.fillRect(26, -2, 5, 4);
+  ctx.fillStyle = "#52627a";
+  ctx.fillRect(5, 3, 7, 10);
+  ctx.restore();
 }
 
 function frame(time) {
@@ -206,9 +305,22 @@ function frame(time) {
 function clearInput() {
   keys.clear();
   touches.clear();
+  mouseDown = false;
 }
 
 action.addEventListener("click", startRound);
+canvas.addEventListener("pointermove", event => {
+  if (event.pointerType === "mouse" && player) pointAim(event);
+});
+canvas.addEventListener("pointerdown", event => {
+  if (event.pointerType !== "mouse" || event.button !== 0 || state !== "playing") return;
+  pointAim(event);
+  mouseDown = true;
+  fireCooldown = 0;
+  fireBullet();
+});
+window.addEventListener("pointerup", () => { mouseDown = false; });
+window.addEventListener("pointercancel", () => { mouseDown = false; });
 window.addEventListener("keydown", event => {
   const key = event.key.toLowerCase();
   if (state !== "playing" || !controls.includes(key) ||
@@ -230,6 +342,6 @@ for (const button of document.querySelectorAll("[data-key]")) {
   }
 }
 
-panelDetail.textContent = `Grab ${RULES.pointsPerLevel} ${THEME.collectiblePlural} to reach the next level.`;
+panelDetail.textContent = `Eat ${RULES.pointsPerLevel} ${THEME.collectiblePlural} to reach the next level.`;
 resetRound();
 requestAnimationFrame(frame);
